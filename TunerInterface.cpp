@@ -2,10 +2,11 @@
 
 #include <arduino.h>
 
-static const int TUNER_START_PIN = 4;
-static const int TUNER_KEY_PIN = 5;
-static const int STATUS_PIN = 7;
-static const int TXR_SLAVE_SELECT = 10;
+static const int TUNER_START_PIN = 10;
+static const int TUNER_KEY_PIN = 7;
+static const int JUMP_PIN = 6;
+static const int STATUS_PIN = 4;
+static const int TXR_SLAVE_SELECT = 5;
 
 static const unsigned long TXR_START_TIMEOUT_MS = 500;
 static const unsigned long TUNER_START_TIMEOUT_MS = 500;
@@ -39,6 +40,7 @@ void TunerInterface::init()
 {
 	pinMode(TUNER_START_PIN, OUTPUT);
 	pinMode(TUNER_KEY_PIN, INPUT_PULLUP);
+	pinMode(JUMP_PIN, INPUT_PULLUP);
 	pinMode(STATUS_PIN, OUTPUT);
 
 	digitalWrite(TUNER_START_PIN, HIGH);
@@ -149,7 +151,7 @@ void TunerInterface::doLogic(unsigned long now, CatMessage &pcMessage, CatMessag
 		}
 
 		// Check for a start command
-		if (txrTunerMessage.command == CAT_FREQUENCY_A)
+		if (txrTunerMessage.command == CAT_FREQUENCY_A || digitalRead(JUMP_PIN) == LOW)
 		{
 			m_state = STATE_TXR_START;
 			m_timeout = now + TXR_START_TIMEOUT_MS;
